@@ -1,0 +1,2 @@
+fb2reader
+beautifulsoup4
