@@ -1,13 +1,13 @@
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
 
-MAINTAINER Stepan Kudin <sskudin@sberbank.ru>
+LABEL org.opencontainers.image.authors="Stepan Kudin <kudin.stepan@yandex.ru>"
 
 COPY requirements_minimal.txt /tmp/requirements.txt
 
 ENV USER=docker
 ENV GROUP=docker
 ENV WORKDIR=/app
-ENV PYTHONPATH=$WORKDIR:$PYTHONPATH
+ENV PYTHONPATH=$WORKDIR
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ENV TZ=Etc/UTC
