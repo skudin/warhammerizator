@@ -1,2 +1,4 @@
 fb2reader
 beautifulsoup4
+razdel
+numpy
