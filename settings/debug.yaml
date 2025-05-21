@@ -1,0 +1,54 @@
+hparams:
+  optimizer:
+    learning_rate: !!float 5e-5
+
+  scheduler:
+    type: linear
+    warmup: true
+
+  loss:
+    lambdas: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+  models:
+    generator_model_tag: ai-forever/FRED-T5-large
+    discriminator_model_tag: cointegrated/rubert-tiny2
+    pretrained_classifier_model: /app/data/models/style_cls/
+    pretrained_classifier_eval: null
+
+  trainer:
+    epochs: 2
+    save_base_folder: /app/data/experiments/
+    from_pretrained: null
+    save_steps: 1
+    eval_strategy: steps
+    eval_steps: 10
+    additional_eval: 0
+    control_file: null
+    lambda_file: null
+    bertscore: false
+
+
+data:
+  dataset:
+    max_samples_train: null
+    max_samples_eval: null
+    nonparal_same_size: false
+
+    wh40k_dataset: /app/data/wh40k_dataset/
+    normal_style_dataset: /app/data/gazetaru_dataset/
+
+    lang: ru
+
+    max_sequence_length: 128
+
+  data_loader:
+    batch_size: 128
+    shuffle: true
+    num_workers: 4
+    pin_memory: false
+
+logger:
+  tracking_uri: http://localhost:5000
+
+common:
+  experiment: debug

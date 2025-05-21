@@ -9,5 +9,11 @@ mlflow
 transformers[torch]
 datasets
 evaluate
+tqdm
+sacrebleu
+nltk
+rouge_score
+absl-py
+bert_score
 --extra-index-url https://download.pytorch.org/whl/cu128
 torch==2.7.0+cu128
