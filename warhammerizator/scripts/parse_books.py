@@ -62,7 +62,8 @@ def processing_archive(filename: Path) -> Dict[str, str]:
 
 def clear_text(text: str):
     re_combine_whitespace = re.compile(r"\s+")
-    re_combine_line_brak = re.compile(r"\n+")
+    re_combine_line_break = re.compile(r"\n+")
+    re_combine_footnote = re.compile(r"\[\d+]")
 
     soup = BeautifulSoup(text, "html.parser")
     clean_paragraphs = []
@@ -77,8 +78,9 @@ def clear_text(text: str):
             tag.decompose()
 
         clean_p_text = cleaner.get_text().strip().replace("\n", "").replace("+", "").replace("\xa0", " ").replace("\t", "")
-        re_combine_whitespace.sub(" ", clean_p_text)
-        re_combine_line_brak.sub("", clean_p_text)
+        clean_p_text = re_combine_whitespace.sub(" ", clean_p_text)
+        clean_p_text = re_combine_line_break.sub("", clean_p_text)
+        clean_p_text = re_combine_footnote.sub("", clean_p_text)
 
         clean_paragraphs.append(clean_p_text)
 
