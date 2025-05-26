@@ -34,6 +34,8 @@ def main():
     tokenized_val = val.map(tokenize_function, batched=True)
     tokenized_test = test.map(tokenize_function, batched=True)
 
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
     print("Hello world!")
 
 
