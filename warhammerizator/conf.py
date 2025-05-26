@@ -1,5 +1,5 @@
 from pathlib import Path
 
-root_path = Path("/") / "app"
+ROOT_PATH = Path("/") / "app"
 
 RANDOM_STATE = 42

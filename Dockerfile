@@ -19,9 +19,12 @@ RUN apt-get update --fix-missing
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         apt-utils \
         curl \
+        git \
+        gcc \
         python3 \
         python3-pip \
-        python3-setuptools
+        python3-setuptools \
+        python3-dev
 
 RUN python3 -m pip install --break-system-packages -r /tmp/requirements.txt
 

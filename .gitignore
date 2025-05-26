@@ -256,5 +256,8 @@ cython_debug/
 .idea/
 
 # Custom.
-data/
+data/*
+!data/models
+data/models/*
+!data/models/style_cls/
 !warhammerizator/scripts
