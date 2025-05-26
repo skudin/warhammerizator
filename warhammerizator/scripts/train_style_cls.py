@@ -30,9 +30,9 @@ def main():
     def tokenize_function(examples):
         return tokenizer(examples["text"], padding='max_length', truncation=True, return_tensors="pt")
 
-    tokenized_train = train.map(tokenize_function, batched=True)
-    tokenized_val = val.map(tokenize_function, batched=True)
-    tokenized_test = test.map(tokenize_function, batched=True)
+    tokenized_train = train.map(tokenize_function, batched=True, num_proc=settings["num_workers"])
+    tokenized_val = val.map(tokenize_function, batched=True, num_proc=settings["num_workers"])
+    tokenized_test = test.map(tokenize_function, batched=True, num_proc=settings["num_workers"])
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 

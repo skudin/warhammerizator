@@ -6,3 +6,5 @@ dataset:
   test: /app/data/cls_dataset/test.csv
 
 model_name: cointegrated/rubert-tiny2
+
+num_workers: 6
