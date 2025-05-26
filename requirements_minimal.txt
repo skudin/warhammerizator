@@ -4,6 +4,7 @@ razdel
 numpy
 pandas
 scikit-learn
+pyyaml
 mlflow
 transformers[torch]
 datasets
