@@ -19,6 +19,7 @@ RUN apt-get update --fix-missing
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         apt-utils \
         curl \
+        git \
         python3 \
         python3-pip \
         python3-setuptools

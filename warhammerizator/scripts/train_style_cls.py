@@ -5,6 +5,7 @@ from typing import Dict, Tuple, Callable
 import yaml
 import torch
 import evaluate
+import mlflow
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
@@ -31,9 +32,7 @@ def main():
 
     train, val, test, le, tokenizer = prepare_dataset(settings["dataset"], settings["model"], settings["num_workers"])
 
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
-    train_cls(settings["experiment"], settings["model"], settings["training"], device)
+    train_cls(settings["experiment"], settings["model"], settings["training"], train, val, tokenizer, device)
 
     print("Hello world!")
 
@@ -72,7 +71,15 @@ def prepare_dataset(
     return tokenized_train, tokenized_val, tokenized_test, le, tokenize_function
 
 
-def train_cls(experiment: str, model_params: Dict, training_params: Dict, device: str):
+def train_cls(
+        experiment: str,
+        model_params: Dict,
+        training_params: Dict,
+        train: Dataset,
+        val: Dataset,
+        tokenizer: Callable,
+        device: str
+):
     model = AutoModelForSequenceClassification.from_pretrained(
         model_params["name"],
         num_labels=model_params["num_labels"],
@@ -92,6 +99,19 @@ def train_cls(experiment: str, model_params: Dict, training_params: Dict, device
             "f1": f1_score.compute(predictions=predictions, references=labels, average="macro")["f1"],
             "accuracy": accuracy.compute(predictions=predictions, references=labels)["accuracy"]
         }
+
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    with mlflow.start_run():
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=train,
+            eval_dataset=val,
+            compute_metrics=compute_metrics,
+            data_collator=data_collator,
+            tokenizer=tokenizer
+        )
 
     pass
 
