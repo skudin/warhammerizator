@@ -6,6 +6,8 @@ import yaml
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer, \
+    DataCollatorWithPadding
 
 
 def parse_command_prompt() -> argparse.Namespace:
@@ -21,6 +23,16 @@ def main():
     settings = read_settings(args.settings)
 
     train, val, test, le = prepare_dataset(settings["dataset"])
+
+    # Text preprocessing.
+    tokenizer = AutoTokenizer.from_pretrained(settings["model_name"], max_len=256)
+
+    def tokenize_function(examples):
+        return tokenizer(examples["text"], padding='max_length', truncation=True, return_tensors="pt")
+
+    tokenized_train = train.map(tokenize_function, batched=True)
+    tokenized_val = val.map(tokenize_function, batched=True)
+    tokenized_test = test.map(tokenize_function, batched=True)
 
     print("Hello world!")
 
