@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 import pandas as pd
 
+from warhammerizator import conf
 from warhammerizator.libs import helpers
 
 
@@ -21,6 +22,8 @@ def main():
     args = parse_command_prompt()
 
     helpers.create_folder_with_dialog(args.output)
+
+    random.seed(conf.RANDOM_STATE)
 
     normal_train, normal_val, normal_test = read_dataset(args.normal_dataset)
     wh40k_train, wh40k_val, wh40k_test = read_dataset(args.wh40k_dataset)
