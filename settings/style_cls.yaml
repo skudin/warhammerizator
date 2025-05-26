@@ -1,0 +1,8 @@
+experiment: debug
+
+dataset:
+  train: /app/data/cls_dataset/train.csv
+  val: /app/data/cls_dataset/val.csv
+  test: /app/data/cls_dataset/test.csv
+
+model_name: cointegrated/rubert-tiny2
