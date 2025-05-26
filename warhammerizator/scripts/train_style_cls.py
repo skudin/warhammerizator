@@ -10,6 +10,8 @@ from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer, \
     DataCollatorWithPadding
 
+from warhammerizator import conf
+
 
 def parse_command_prompt() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -29,7 +31,7 @@ def main():
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-    train_model(settings["model"], device)
+    train_cls(settings["experiment"], settings["model"], settings["training"], device)
 
     print("Hello world!")
 
@@ -68,13 +70,17 @@ def prepare_dataset(
     return tokenized_train, tokenized_val, tokenized_test, le, tokenize_function
 
 
-def train_model(model_params: Dict, device: str):
+def train_cls(experiment: str, model_params: Dict, training_params: Dict, device: str):
     model = AutoModelForSequenceClassification.from_pretrained(
         model_params["name"],
         num_labels=model_params["num_labels"],
         device_map=device,
         classifier_dropout=model_params["classifier_dropout"]
     )
+
+    training_args = TrainingArguments(output_dir=conf.root_path / "experiments" / experiment, **training_params)
+
+    pass
 
 
 if __name__ == "__main__":

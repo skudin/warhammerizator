@@ -12,3 +12,19 @@ model:
   classifier_dropout: 0.1
 
 num_workers: 6
+
+training:
+  warmup_steps: 500
+  learning_rate: 1e-5
+  eval_strategy: epoch
+  save_strategy: epoch
+  per_device_train_batch_size: 30
+  per_device_eval_batch_size: 10
+  num_train_epochs: 5
+  torch_compile: True
+  optim: adamw_torch_fused
+  logging_strategy: steps
+  logging_steps: 200
+  metric_for_best_model: f1
+  report_to: mlflow
+  load_best_model_at_end: true
