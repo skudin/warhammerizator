@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Callable
 
 import yaml
 import pandas as pd
@@ -22,17 +22,7 @@ def main():
 
     settings = read_settings(args.settings)
 
-    train, val, test, le = prepare_dataset(settings["dataset"])
-
-    # Text preprocessing.
-    tokenizer = AutoTokenizer.from_pretrained(settings["model_name"], max_len=256)
-
-    def tokenize_function(examples):
-        return tokenizer(examples["text"], padding='max_length', truncation=True, return_tensors="pt")
-
-    tokenized_train = train.map(tokenize_function, batched=True, num_proc=settings["num_workers"])
-    tokenized_val = val.map(tokenize_function, batched=True, num_proc=settings["num_workers"])
-    tokenized_test = test.map(tokenize_function, batched=True, num_proc=settings["num_workers"])
+    train, val, test, le, tokenizer = prepare_dataset(settings["dataset"], settings["model"], settings["num_workers"])
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
@@ -44,7 +34,11 @@ def read_settings(filename: Path) -> Dict:
         return yaml.load(stream=fp, Loader=yaml.FullLoader)
 
 
-def prepare_dataset(dataset_paths: Dict[str, str]) -> Tuple[Dataset, Dataset, Dataset, LabelEncoder]:
+def prepare_dataset(
+        dataset_paths: Dict[str, str],
+        model_params: Dict,
+        num_workers: int = 1
+) -> Tuple[Dataset, Dataset, Dataset, LabelEncoder, Callable]:
     train_df = pd.read_csv(dataset_paths["train"])
     val_df = pd.read_csv(dataset_paths["val"])
     test_df = pd.read_csv(dataset_paths["test"])
@@ -56,7 +50,17 @@ def prepare_dataset(dataset_paths: Dict[str, str]) -> Tuple[Dataset, Dataset, Da
     val = Dataset.from_pandas(val_df)
     test = Dataset.from_pandas(test_df)
 
-    return train, val, test, le
+    # Text preprocessing.
+    tokenizer = AutoTokenizer.from_pretrained(model_params["name"], max_len=model_params["max_len"])
+
+    def tokenize_function(examples):
+        return tokenizer(examples["text"], padding="max_length", truncation=True, return_tensors="pt")
+
+    tokenized_train = train.map(tokenize_function, batched=True, num_proc=num_workers)
+    tokenized_val = val.map(tokenize_function, batched=True, num_proc=num_workers)
+    tokenized_test = test.map(tokenize_function, batched=True, num_proc=num_workers)
+
+    return tokenized_train, tokenized_val, tokenized_test, le, tokenize_function
 
 
 if __name__ == "__main__":

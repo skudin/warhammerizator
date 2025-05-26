@@ -5,6 +5,8 @@ dataset:
   val: /app/data/cls_dataset/val.csv
   test: /app/data/cls_dataset/test.csv
 
-model_name: cointegrated/rubert-tiny2
+model:
+  name: cointegrated/rubert-tiny2
+  max_len: 256
 
 num_workers: 6
