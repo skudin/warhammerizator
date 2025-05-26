@@ -5,6 +5,7 @@ from typing import Dict, Tuple, Callable
 import yaml
 import torch
 import evaluate
+import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
@@ -83,6 +84,14 @@ def train_cls(experiment: str, model_params: Dict, training_params: Dict, device
 
     f1_score = evaluate.load("f1")
     accuracy = evaluate.load("accuracy")
+
+    def compute_metrics(eval_pred):
+        logits, labels = eval_pred
+        predictions = np.argmax(logits, axis=-1)
+        return {
+            "f1": f1_score.compute(predictions=predictions, references=labels, average="macro")["f1"],
+            "accuracy": accuracy.compute(predictions=predictions, references=labels)["accuracy"]
+        }
 
     pass
 
