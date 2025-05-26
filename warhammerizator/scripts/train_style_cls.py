@@ -4,6 +4,7 @@ from typing import Dict, Tuple, Callable
 
 import yaml
 import torch
+import evaluate
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
@@ -79,6 +80,9 @@ def train_cls(experiment: str, model_params: Dict, training_params: Dict, device
     )
 
     training_args = TrainingArguments(output_dir=conf.root_path / "experiments" / experiment, **training_params)
+
+    f1_score = evaluate.load("f1")
+    accuracy = evaluate.load("accuracy")
 
     pass
 
