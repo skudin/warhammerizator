@@ -8,5 +8,7 @@ dataset:
 model:
   name: cointegrated/rubert-tiny2
   max_len: 256
+  num_labels: 2
+  classifier_dropout: 0.1
 
 num_workers: 6

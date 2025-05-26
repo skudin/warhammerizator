@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Tuple, Callable
 
 import yaml
+import torch
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
@@ -22,9 +23,13 @@ def main():
 
     settings = read_settings(args.settings)
 
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
     train, val, test, le, tokenizer = prepare_dataset(settings["dataset"], settings["model"], settings["num_workers"])
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    train_model(settings["model"], device)
 
     print("Hello world!")
 
@@ -61,6 +66,15 @@ def prepare_dataset(
     tokenized_test = test.map(tokenize_function, batched=True, num_proc=num_workers)
 
     return tokenized_train, tokenized_val, tokenized_test, le, tokenize_function
+
+
+def train_model(model_params: Dict, device: str):
+    model = AutoModelForSequenceClassification.from_pretrained(
+        model_params["name"],
+        num_labels=model_params["num_labels"],
+        device_map=device,
+        classifier_dropout=model_params["classifier_dropout"]
+    )
 
 
 if __name__ == "__main__":
