@@ -12,6 +12,7 @@ model:
   classifier_dropout: 0.1
 
 num_workers: 6
+mlflow_tracking_uri: http://localhost:5000
 
 training:
   warmup_steps: 500

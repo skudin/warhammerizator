@@ -31,6 +31,8 @@ def main():
     settings = read_settings(args.settings)
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    mlflow.set_tracking_uri(settings["mlflow_tracking_uri"])
+    mlflow.set_experiment(settings["experiment"])
 
     train, val, test, le, tokenizer = prepare_dataset(settings["dataset"], settings["model"], settings["num_workers"])
     save_directory = conf.ROOT_PATH / "data" / "models" / settings["experiment"]
