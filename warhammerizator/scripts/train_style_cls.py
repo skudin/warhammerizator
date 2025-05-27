@@ -1,6 +1,7 @@
 import argparse
 import shutil
 from pathlib import Path
+from pprint import pprint
 from typing import Dict, Tuple, Callable
 
 import yaml
@@ -37,7 +38,11 @@ def main():
     model = train_cls(settings["experiment"], settings["model"], settings["training"], train, val, tokenizer, device)
     save_model(model, tokenizer, save_directory)
 
-    test_model(save_directory, test)
+    test_metrics = test_model(save_directory, test)
+
+    print()
+    print("Test metrics:")
+    pprint(test_metrics)
 
     print("Done.")
 
@@ -131,7 +136,7 @@ def save_model(model, tokenizer, save_directory: Path) -> None:
     model.save_pretrained(save_directory)
 
 
-def test_model(save_directory: Path, test_dataset: Dataset):
+def test_model(save_directory: Path, test_dataset: Dataset) -> Dict:
     pipe = pipeline("text-classification", model=save_directory.as_posix())
 
     accuracy = evaluate.load("accuracy")
@@ -146,7 +151,7 @@ def test_model(save_directory: Path, test_dataset: Dataset):
         n_resamples=200,
     )
 
-    print(result)
+    return result
 
 
 if __name__ == "__main__":
