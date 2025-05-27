@@ -33,7 +33,8 @@ def main():
 
     train, val, test, le, tokenizer = prepare_dataset(settings["dataset"], settings["model"], settings["num_workers"])
 
-    train_cls(settings["experiment"], settings["model"], settings["training"], train, val, tokenizer, device)
+    model = train_cls(settings["experiment"], settings["model"], settings["training"], train, val, tokenizer, device)
+    save_model(model, tokenizer, settings["experiment"])
 
     print("Hello world!")
 
@@ -116,16 +117,17 @@ def train_cls(
 
         trainer.train()
 
-        # Save model.
-        save_directory = conf.ROOT_PATH / "data" / "models" / experiment
-        if save_directory.exists():
-            shutil.rmtree(save_directory)
-        save_directory.mkdir(parents=True)
+    return model
 
-        tokenizer.save_pretrained(save_directory)
-        model.save_pretrained(save_directory)
 
-    pass
+def save_model(model, tokenizer, experiment) -> None:
+    save_directory = conf.ROOT_PATH / "data" / "models" / experiment
+    if save_directory.exists():
+        shutil.rmtree(save_directory)
+    save_directory.mkdir(parents=True)
+
+    tokenizer.save_pretrained(save_directory)
+    model.save_pretrained(save_directory)
 
 
 if __name__ == "__main__":
