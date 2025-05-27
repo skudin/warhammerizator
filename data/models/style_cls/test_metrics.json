@@ -1,0 +1,13 @@
+{
+    "accuracy": {
+        "confidence_interval": [
+            0.9991965304751299,
+            0.9999202506681932
+        ],
+        "standard_error": 0.00017098093331672086,
+        "score": 0.9996349032493611
+    },
+    "total_time_in_seconds": 36.95741689001443,
+    "samples_per_second": 370.56161259203884,
+    "latency_in_seconds": 0.0026986065637104365
+}
