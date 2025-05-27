@@ -63,9 +63,9 @@ def prepare_dataset(
         model_params: Dict,
         num_workers: int = 1
 ) -> Tuple[Dataset, Dataset, Dataset, LabelEncoder, PreTrainedTokenizerBase]:
-    train_df = pd.read_csv(dataset_paths["train"])[:1000]
-    val_df = pd.read_csv(dataset_paths["val"])[:1000]
-    test_df = pd.read_csv(dataset_paths["test"])[:1000]
+    train_df = pd.read_csv(dataset_paths["train"])
+    val_df = pd.read_csv(dataset_paths["val"])
+    test_df = pd.read_csv(dataset_paths["test"])
 
     le = LabelEncoder()
     train_df.rate = le.fit_transform(train_df.label)
