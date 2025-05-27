@@ -1,4 +1,4 @@
-experiment: debug
+experiment: style_cls
 
 dataset:
   train: /app/data/cls_dataset/train.csv
@@ -21,7 +21,7 @@ training:
   save_strategy: epoch
   per_device_train_batch_size: 15
   per_device_eval_batch_size: 15
-  num_train_epochs: 2
+  num_train_epochs: 5
   torch_compile: True
   optim: adamw_torch_fused
   logging_strategy: steps
