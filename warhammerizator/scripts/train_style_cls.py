@@ -96,7 +96,10 @@ def train_cls(
         classifier_dropout=model_params["classifier_dropout"]
     )
 
-    training_args = TrainingArguments(output_dir=conf.ROOT_PATH / "experiments" / experiment, **training_params)
+    training_args = TrainingArguments(
+        output_dir=conf.ROOT_PATH / "data" / "experiments" / experiment,
+        **training_params
+    )
 
     f1_score = evaluate.load("f1")
     accuracy = evaluate.load("accuracy")
