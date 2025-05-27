@@ -39,7 +39,7 @@ def main():
 
     test_model(save_directory, test)
 
-    print("Hello world!")
+    print("Done.")
 
 
 def read_settings(filename: Path) -> Dict:
@@ -147,8 +147,6 @@ def test_model(save_directory: Path, test_dataset: Dataset):
     )
 
     print(result)
-
-    return result
 
 
 if __name__ == "__main__":
