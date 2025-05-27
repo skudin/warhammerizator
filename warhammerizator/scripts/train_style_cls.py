@@ -1,4 +1,5 @@
 import argparse
+import shutil
 from pathlib import Path
 from typing import Dict, Tuple, Callable
 
@@ -87,7 +88,7 @@ def train_cls(
         classifier_dropout=model_params["classifier_dropout"]
     )
 
-    training_args = TrainingArguments(output_dir=conf.root_path / "experiments" / experiment, **training_params)
+    training_args = TrainingArguments(output_dir=conf.ROOT_PATH / "experiments" / experiment, **training_params)
 
     f1_score = evaluate.load("f1")
     accuracy = evaluate.load("accuracy")
@@ -114,6 +115,15 @@ def train_cls(
         )
 
         trainer.train()
+
+        # Save model.
+        save_directory = conf.ROOT_PATH / "data" / "models" / experiment
+        if save_directory.exists():
+            shutil.rmtree(save_directory)
+        save_directory.mkdir(parents=True)
+
+        tokenizer.save_pretrained(save_directory)
+        model.save_pretrained(save_directory)
 
     pass
 
