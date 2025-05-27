@@ -1,5 +1,6 @@
 import argparse
 import shutil
+import json
 from pathlib import Path
 from pprint import pprint
 from typing import Dict, Tuple
@@ -16,6 +17,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trai
     DataCollatorWithPadding, PreTrainedTokenizerBase, pipeline
 
 from warhammerizator import conf
+from warhammerizator.libs import helpers
 
 
 def parse_command_prompt() -> argparse.Namespace:
@@ -29,6 +31,8 @@ def main():
     args = parse_command_prompt()
 
     settings = read_settings(args.settings)
+
+    helpers.seed_everything()
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     mlflow.set_tracking_uri(settings["mlflow_tracking_uri"])
@@ -59,9 +63,9 @@ def prepare_dataset(
         model_params: Dict,
         num_workers: int = 1
 ) -> Tuple[Dataset, Dataset, Dataset, LabelEncoder, PreTrainedTokenizerBase]:
-    train_df = pd.read_csv(dataset_paths["train"])
-    val_df = pd.read_csv(dataset_paths["val"])
-    test_df = pd.read_csv(dataset_paths["test"])
+    train_df = pd.read_csv(dataset_paths["train"])[:1000]
+    val_df = pd.read_csv(dataset_paths["val"])[:1000]
+    test_df = pd.read_csv(dataset_paths["test"])[:1000]
 
     le = LabelEncoder()
     train_df.rate = le.fit_transform(train_df.label)
@@ -155,6 +159,9 @@ def test_model(save_directory: Path, test_dataset: Dataset) -> Dict:
         strategy="bootstrap",
         n_resamples=200,
     )
+
+    with open(save_directory / "test_metrics.json", "w") as fp:
+        json.dump(obj=result, fp=fp, indent=4)
 
     return result
 
