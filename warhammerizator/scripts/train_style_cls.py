@@ -12,7 +12,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer, \
-    DataCollatorWithPadding, PreTrainedTokenizerBase
+    DataCollatorWithPadding, PreTrainedTokenizerBase, pipeline
 
 from warhammerizator import conf
 
@@ -32,9 +32,12 @@ def main():
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     train, val, test, le, tokenizer = prepare_dataset(settings["dataset"], settings["model"], settings["num_workers"])
+    save_directory = conf.ROOT_PATH / "data" / "models" / settings["experiment"]
 
     model = train_cls(settings["experiment"], settings["model"], settings["training"], train, val, tokenizer, device)
-    save_model(model, tokenizer, settings["experiment"])
+    save_model(model, tokenizer, save_directory)
+
+    test_model(save_directory, test)
 
     print("Hello world!")
 
@@ -68,9 +71,8 @@ def prepare_dataset(
 
     tokenized_train = train.map(tokenize_function, batched=True, num_proc=num_workers)
     tokenized_val = val.map(tokenize_function, batched=True, num_proc=num_workers)
-    tokenized_test = test.map(tokenize_function, batched=True, num_proc=num_workers)
 
-    return tokenized_train, tokenized_val, tokenized_test, le, tokenizer
+    return tokenized_train, tokenized_val, test, le, tokenizer
 
 
 def train_cls(
@@ -120,14 +122,33 @@ def train_cls(
     return model
 
 
-def save_model(model, tokenizer, experiment) -> None:
-    save_directory = conf.ROOT_PATH / "data" / "models" / experiment
+def save_model(model, tokenizer, save_directory: Path) -> None:
     if save_directory.exists():
         shutil.rmtree(save_directory)
     save_directory.mkdir(parents=True)
 
     tokenizer.save_pretrained(save_directory)
     model.save_pretrained(save_directory)
+
+
+def test_model(save_directory: Path, test_dataset: Dataset):
+    pipe = pipeline("text-classification", model=save_directory.as_posix())
+
+    accuracy = evaluate.load("accuracy")
+
+    eval = evaluate.evaluator("text-classification")
+    result = eval.compute(
+        model_or_pipeline=pipe,
+        data=test_dataset,
+        metric=accuracy,
+        label_mapping={"LABEL_0": 0, "LABEL_1": 1},
+        strategy="bootstrap",
+        n_resamples=200,
+    )
+
+    print(result)
+
+    return result
 
 
 if __name__ == "__main__":
