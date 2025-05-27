@@ -11,7 +11,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer, \
-    DataCollatorWithPadding
+    DataCollatorWithPadding, PreTrainedTokenizerBase
 
 from warhammerizator import conf
 
@@ -46,10 +46,10 @@ def prepare_dataset(
         dataset_paths: Dict[str, str],
         model_params: Dict,
         num_workers: int = 1
-) -> Tuple[Dataset, Dataset, Dataset, LabelEncoder, Callable]:
-    train_df = pd.read_csv(dataset_paths["train"])
-    val_df = pd.read_csv(dataset_paths["val"])
-    test_df = pd.read_csv(dataset_paths["test"])
+) -> Tuple[Dataset, Dataset, Dataset, LabelEncoder, PreTrainedTokenizerBase]:
+    train_df = pd.read_csv(dataset_paths["train"])[: 1000]
+    val_df = pd.read_csv(dataset_paths["val"])[: 1000]
+    test_df = pd.read_csv(dataset_paths["test"])[: 1000]
 
     le = LabelEncoder()
     train_df.rate = le.fit_transform(train_df.label)
@@ -68,7 +68,7 @@ def prepare_dataset(
     tokenized_val = val.map(tokenize_function, batched=True, num_proc=num_workers)
     tokenized_test = test.map(tokenize_function, batched=True, num_proc=num_workers)
 
-    return tokenized_train, tokenized_val, tokenized_test, le, tokenize_function
+    return tokenized_train, tokenized_val, tokenized_test, le, tokenizer
 
 
 def train_cls(
@@ -77,7 +77,7 @@ def train_cls(
         training_params: Dict,
         train: Dataset,
         val: Dataset,
-        tokenizer: Callable,
+        tokenizer: PreTrainedTokenizerBase,
         device: str
 ):
     model = AutoModelForSequenceClassification.from_pretrained(
@@ -112,6 +112,8 @@ def train_cls(
             data_collator=data_collator,
             tokenizer=tokenizer
         )
+
+        trainer.train()
 
     pass
 
