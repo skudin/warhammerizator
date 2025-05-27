@@ -2,7 +2,7 @@ import argparse
 import shutil
 from pathlib import Path
 from pprint import pprint
-from typing import Dict, Tuple, Callable
+from typing import Dict, Tuple
 
 import yaml
 import torch
