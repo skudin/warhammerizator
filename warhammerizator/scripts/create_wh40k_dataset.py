@@ -19,7 +19,7 @@ def parse_command_prompt() -> argparse.Namespace:
     parser.add_argument("--min_sentences_in_sample", type=int, default=1, help="minimal sentences in sample")
     parser.add_argument("--max_sentences_in_sample", type=int, default=8, help="max sentences in sample")
     parser.add_argument("--min_sequence_len", type=int, default=64, help="min sequence length")
-    parser.add_argument("--max_sequence_len", type=int, default=256, help="max sequence length")
+    parser.add_argument("--max_sequence_len", type=int, default=255, help="max sequence length")
 
     parser.add_argument("--val_size", type=float, default=0.2, help="size of validation part of dataset")
     parser.add_argument("--test_size", type=float, default=0.2, help="size of test part of dataset")
