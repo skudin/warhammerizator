@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 
 from warhammerizator import conf
 from warhammerizator.libs import helpers
+from warhammerizator.libs import data_tools
 
 
 def parse_command_prompt() -> argparse.Namespace:
@@ -35,7 +36,7 @@ def main():
     random.seed(conf.RANDOM_STATE)
 
     content = read_parsed_books(args.parsed_books)
-    samples = generate_samples(
+    samples = data_tools.generate_samples(
         content,
         args.num_samples,
         args.min_sentences_in_sample,
@@ -61,37 +62,9 @@ def read_parsed_books(path: Path) -> List[str]:
     for book_filename in books:
         with open(book_filename, "r") as fp:
             text = fp.read()
-            content.extend([sentence.text for sentence in sentenize(text)])
+            content.extend([sentence.text.strip() for sentence in sentenize(text)])
 
     return content
-
-
-def generate_samples(
-        content: List[str],
-        num_samples: int,
-        min_sentences_in_sample: int,
-        max_sentences_in_sample: int,
-        min_sequence_len: int,
-        max_sequence_len: int
-) -> List[str]:
-    used_start_pos = set()
-    result = list()
-
-    while len(result) < num_samples:
-        start_pos = random.randrange(0, len(content))
-
-        if start_pos in used_start_pos:
-            continue
-
-        num_sentences = random.randint(min_sentences_in_sample, max_sentences_in_sample)
-
-        sentences = [content[start_pos + i] for i in range(num_sentences)]
-        sample = " ".join(sentences)
-        if min_sequence_len <= len(sample) <= max_sequence_len:
-            result.append(sample)
-            used_start_pos.add(start_pos)
-
-    return result
 
 
 def split_dataset(samples: List[str], val_size: float, test_size: float) -> Tuple[List[str], List[str], List[str]]:
