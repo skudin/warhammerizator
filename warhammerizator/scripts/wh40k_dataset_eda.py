@@ -1,6 +1,7 @@
 import argparse
 import json
 from pathlib import Path
+from pprint import pprint
 from typing import Dict
 
 import numpy as np
@@ -29,6 +30,18 @@ def main():
     save_stats(train_stats, args.output / "train_stats.json")
     save_stats(val_stats, args.output / "val_stats.json")
     save_stats(test_stats, args.output / "test_stats.json")
+
+    print("Train stats:")
+    pprint(train_stats, sort_dicts=False)
+    print()
+
+    print("Val stats:")
+    pprint(val_stats, sort_dicts=False)
+    print()
+
+    print("Test stats:")
+    pprint(test_stats, sort_dicts=False)
+    print()
 
     print("Done.")
 
