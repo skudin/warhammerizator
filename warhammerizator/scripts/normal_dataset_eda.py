@@ -1,5 +1,4 @@
 import argparse
-import json
 from pathlib import Path
 from pprint import pprint
 from typing import Dict
@@ -12,7 +11,7 @@ from warhammerizator.libs import helpers
 
 def parse_command_prompt() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", required=True, type=Path, help="path to gazeta ru dataset")
+    parser.add_argument("--input", required=True, type=Path, help="path to normal dataset")
     parser.add_argument("--output", required=True, type=Path, help="output path")
 
     return parser.parse_args()
@@ -23,17 +22,13 @@ def main():
 
     helpers.create_folder_with_dialog(args.output)
 
-    train_stats = processing_dataset_part(args.input / "gazeta_train.jsonl")
+    train_stats = processing_dataset_part(args.input / "train.txt")
     print("Statistics calculation for train part of dataset is finished.")
-    val_stats = processing_dataset_part(args.input / "gazeta_val.jsonl")
+    val_stats = processing_dataset_part(args.input / "val.txt")
     print("Statistics calculation for val part of dataset is finished.")
-    test_stats = processing_dataset_part(args.input / "gazeta_test.jsonl")
+    test_stats = processing_dataset_part(args.input / "test.txt")
     print("Statistics calculation for test part of dataset is finished.")
     print()
-
-    save_stats(train_stats, args.output / "train_stats.json")
-    save_stats(val_stats, args.output / "val_stats.json")
-    save_stats(test_stats, args.output / "test_stats.json")
 
     print("Train stats:")
     pprint(train_stats, sort_dicts=False)
@@ -58,10 +53,11 @@ def processing_dataset_part(filename: Path) -> Dict[str, Dict[str, float | int] 
 
     with open(filename, "r") as fp:
         for line in fp:
-            data = json.loads(line)
-            num_sentences.append(len(list(sentenize(data["summary"]))))
-            num_words.append(len(data["summary"].split(" ")))
-            num_characters.append(len(data["summary"]))
+            clean_line = line.strip()
+
+            num_sentences.append(len(list(sentenize(clean_line))))
+            num_words.append(len(clean_line.split(" ")))
+            num_characters.append(len(clean_line))
 
             samples_counter += 1
 
@@ -86,11 +82,6 @@ def processing_dataset_part(filename: Path) -> Dict[str, Dict[str, float | int] 
             "max": int(np.max(num_characters))
         }
     }
-
-
-def save_stats(stats: Dict[str, Dict[str, float | int]], filename: Path):
-    with open(filename, "w") as fp:
-        json.dump(obj=stats, fp=fp, indent=4)
 
 
 if __name__ == "__main__":
