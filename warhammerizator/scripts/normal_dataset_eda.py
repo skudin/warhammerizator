@@ -1,4 +1,5 @@
 import argparse
+import json
 from pathlib import Path
 from pprint import pprint
 from typing import Dict
@@ -29,6 +30,10 @@ def main():
     test_stats = processing_dataset_part(args.input / "test.txt")
     print("Statistics calculation for test part of dataset is finished.")
     print()
+
+    save_stats(train_stats, args.output / "train_stats.json")
+    save_stats(val_stats, args.output / "val_stats.json")
+    save_stats(test_stats, args.output / "test_stats.json")
 
     print("Train stats:")
     pprint(train_stats, sort_dicts=False)
@@ -82,6 +87,11 @@ def processing_dataset_part(filename: Path) -> Dict[str, Dict[str, float | int] 
             "max": int(np.max(num_characters))
         }
     }
+
+
+def save_stats(stats: Dict[str, Dict[str, float | int] | int], filename: Path):
+    with open(filename, "w") as fp:
+        json.dump(obj=stats, fp=fp, indent=4)
 
 
 if __name__ == "__main__":
