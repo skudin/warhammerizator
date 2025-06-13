@@ -9,7 +9,7 @@ def generate_samples(
         max_sentences_in_sample: int,
         min_sequence_len: int,
         max_sequence_len: int,
-        max_tries: int = 50
+        max_tries: int = 100
 ) -> List[str]:
     used_start_pos = set()
     result = list()

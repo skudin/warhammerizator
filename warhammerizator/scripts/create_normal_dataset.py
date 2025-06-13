@@ -17,7 +17,7 @@ def parse_command_prompt() -> argparse.Namespace:
     parser.add_argument("--output", required=True, type=Path, help="output path")
 
     parser.add_argument("--min_sentences_in_sample", type=int, default=1, help="minimal sentences in sample")
-    parser.add_argument("--max_sentences_in_sample", type=int, default=8, help="max sentences in sample")
+    parser.add_argument("--max_sentences_in_sample", type=int, default=5, help="max sentences in sample")
     parser.add_argument("--min_sequence_len", type=int, default=64, help="min sequence length")
     parser.add_argument("--max_sequence_len", type=int, default=127, help="max sequence length")
 
