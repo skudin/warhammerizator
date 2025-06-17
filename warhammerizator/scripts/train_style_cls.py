@@ -78,10 +78,13 @@ def prepare_dataset(
     tokenizer = AutoTokenizer.from_pretrained(model_params["name"], max_len=model_params["max_len"])
 
     def tokenize_function(examples):
-        return tokenizer(examples["text"], padding="max_length", truncation=True, return_tensors="pt")
+        return tokenizer(examples["text"], padding="max_length", max_length=model_params["max_len"],
+                         truncation="longest_first", return_tensors="pt")
 
     tokenized_train = train.map(tokenize_function, batched=True, num_proc=num_workers)
     tokenized_val = val.map(tokenize_function, batched=True, num_proc=num_workers)
+
+    tmp = tokenized_train[0]
 
     return tokenized_train, tokenized_val, test, le, tokenizer
 
