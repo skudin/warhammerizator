@@ -1,6 +1,7 @@
 import argparse
 import json
 import random
+import re
 from pathlib import Path
 from typing import List
 
@@ -74,10 +75,14 @@ def processing_dataset_part(
 ) -> List[str]:
     result = list()
 
+    re_combine_line_break = re.compile(r"\n+")
+
     with open(filename, "r") as fp:
         for num, line in enumerate(fp):
             item = json.loads(line)
-            content = [sentence.text.strip() for sentence in sentenize(item["text"])]
+            text = item["text"]
+            clean_text = re_combine_line_break.sub("", text)
+            content = [sentence.text.strip() for sentence in sentenize(clean_text)]
 
             sample = data_tools.generate_samples(
                 content=content,
