@@ -20,7 +20,7 @@ class MonostyleDataset(Dataset):
 
     def _load_data(self) -> List[str]:
         with open(self._dataset_path) as fp:
-            data = [line.strip() for line in fp]
+            data = [line.strip() for line in fp][:128]
 
         print(f"Dataset {self._style}, part {self._part}: {len(data)} examples.")
 

@@ -140,10 +140,11 @@ class Evaluator:
                    # 'self-ROUGE-2 A->B': avg_AB_r2_self, 'self-ROUGE-2 B->A': avg_BA_r2_self,
                    # 'self-ROUGE-L A->B': avg_AB_rL_self, 'self-ROUGE-L B->A': avg_BA_rL_self,
                    'style accuracy': acc, 'acc-BLEU': avg_acc_bleu_self, 'g-acc-BLEU': avg_acc_bleu_self_geom,
-                   'h-acc-BLEU': avg_acc_bleu_self_h}
+                   'h-acc-BLEU': avg_acc_bleu_self_h
+                   }
 
         if phase == 'validation':
-            base_path = self.settings.trainer["save_base_folder"] / f"epoch_{epoch}"
+            base_path = self.settings.trainer["save_base_folder"] / f"epoch_{epoch}_step_{current_training_step}"
             if self.settings.trainer["eval_strategy"] == 'epochs':
                 suffix = f'epoch{epoch}'
                 if epoch < self.settings.trainer["additional_eval"]:
@@ -170,11 +171,11 @@ class Evaluator:
         df_AB = pd.DataFrame()
         df_AB['A (source)'] = real_A
         df_AB['B (generated)'] = pred_B
-        df_AB.to_csv(f"{base_path}AB_{suffix}.csv", sep=',', header=True)
+        df_AB.to_csv(base_path / f"AB_{suffix}.csv", sep=',', header=True)
         df_BA = pd.DataFrame()
         df_BA['B (source)'] = real_B
         df_BA['A (generated)'] = pred_A
-        df_BA.to_csv(f"{base_path}BA_{suffix}.csv", sep=',', header=True)
+        df_BA.to_csv(base_path / f"BA_{suffix}.csv", sep=',', header=True)
 
         if self.experiment:
             for m, v in metrics.items():

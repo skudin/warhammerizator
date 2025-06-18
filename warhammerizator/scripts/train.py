@@ -86,6 +86,8 @@ def main():
                 cycleGAN.train()  # set training mode
 
                 for unsupervised_a, unsupervised_b in zip(mono_dl_a_train, mono_dl_b_train):
+                    cycleGAN.train()
+
                     len_a, len_b = len(unsupervised_a), len(unsupervised_b)
                     if len_a > len_b:
                         unsupervised_a = unsupervised_a[:len_b]
@@ -107,20 +109,22 @@ def main():
                     progress_bar.update(1)
                     current_training_step += 1
 
-                evaluator.run_eval_mono(epoch, current_training_step, 'validation', mono_dl_a_eval, mono_dl_b_eval)
+                    if current_training_step % settings.trainer["eval_steps"] == 0:
+                        cycleGAN.eval()
+                        evaluator.run_eval_mono(epoch, current_training_step, 'validation', mono_dl_a_eval, mono_dl_b_eval)
+                        # torch.cuda.empty_cache()
 
-                if epoch % settings.trainer["save_steps"] == 0:
-                    cycleGAN.save_models(settings.trainer["save_base_folder"] / f"epoch_{epoch}")
-                    checkpoint = {'epoch': epoch + 1, 'training_step': current_training_step,
-                                  'optimizer': optimizer.state_dict(), 'lr_scheduler': lr_scheduler.state_dict()}
-                    torch.save(checkpoint, settings.trainer["save_base_folder"] / f"epoch_{epoch}" / "checkpoint.pth")
-                    if epoch > 0 and os.path.exists(settings.trainer["save_base_folder"] / f"epoch_{epoch - 1}" / "checkpoint.pth"):
-                        os.remove(settings.trainer["save_base_folder"] / f"epoch_{epoch - 1}" / "checkpoint.pth")
-                    if epoch > 0 and os.path.exists(settings.trainer["save_base_folder"] / "loss.pickle"):
-                        os.remove(settings.trainer["save_base_folder"] / "loss.pickle")
+                    if current_training_step % settings.trainer["save_steps"] == 0:
+                        cycleGAN.save_models(settings.trainer["save_base_folder"] / f"epoch_{epoch}_step_{current_training_step}")
+                        checkpoint = {'epoch': epoch + 1, 'training_step': current_training_step,
+                                      'optimizer': optimizer.state_dict(), 'lr_scheduler': lr_scheduler.state_dict()}
+                        torch.save(checkpoint, settings.trainer["save_base_folder"] / f"epoch_{epoch}_step_{current_training_step}" / "checkpoint.pth")
 
-                        with open(settings.trainer["save_base_folder"] / "loss.pickle", 'wb') as fp:
-                            pickle.dump(loss_logging, fp)
+                        if epoch > 0 and os.path.exists(settings.trainer["save_base_folder"] / "loss.pickle"):
+                            os.remove(settings.trainer["save_base_folder"] / "loss.pickle")
+
+                            with open(settings.trainer["save_base_folder"] / "loss.pickle", 'wb') as fp:
+                                pickle.dump(loss_logging, fp)
 
                 if settings.trainer["control_file"] is not None and os.path.exists(settings.trainer["control_file"]):
                     with open(args.control_file, 'r') as f:
@@ -128,7 +132,8 @@ def main():
                             print(f'STOP command received - Stopped at epoch {epoch}')
                             os.remove(args.control_file)
                             break
-                cycleGAN.train()
+
+        evaluator.run_eval_mono(epoch, current_training_step, 'validation', mono_dl_a_eval, mono_dl_b_eval)
 
         print('End training...')
 

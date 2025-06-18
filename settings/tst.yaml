@@ -16,12 +16,12 @@ hparams:
     pretrained_classifier_eval: null
 
   trainer:
-    epochs: 2
+    epochs: 30
     save_base_folder: /app/data/experiments/
     from_pretrained: null
-    save_steps: 2
+    save_steps: 300
     eval_strategy: steps
-    eval_steps: 2
+    eval_steps: 100
     additional_eval: 0
     control_file: null
     lambda_file: null
@@ -44,11 +44,11 @@ data:
   data_loader:
     batch_size: 32
     shuffle: true
-    num_workers: 4
+    num_workers: 6
     pin_memory: false
 
 logger:
   tracking_uri: http://localhost:5000
 
 common:
-  experiment: debug
+  experiment: tst
