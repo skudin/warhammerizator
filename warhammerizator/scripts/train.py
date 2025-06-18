@@ -92,14 +92,16 @@ def main():
                     else:
                         unsupervised_b = unsupervised_b[:len_a]
 
-                    cycleGAN.training_cycle(sentences_a=unsupervised_a,
-                                            sentences_b=unsupervised_b,
-                                            lambdas=settings.loss["lambdas"],
-                                            mlflow_run=mlflow_run,
-                                            loss_logging=loss_logging,
-                                            training_step=current_training_step)
+                    success = cycleGAN.training_cycle(sentences_a=unsupervised_a,
+                                                      sentences_b=unsupervised_b,
+                                                      lambdas=settings.loss["lambdas"],
+                                                      mlflow_run=mlflow_run,
+                                                      loss_logging=loss_logging,
+                                                      training_step=current_training_step)
 
-                    optimizer.step()
+                    if success:
+                        torch.nn.utils.clip_grad_norm_(cycleGAN.get_optimizer_parameters(), 5)
+                        optimizer.step()
                     lr_scheduler.step()
                     optimizer.zero_grad()
                     progress_bar.update(1)

@@ -106,6 +106,10 @@ class CycleGANModel(nn.Module):
         # second half
         out_reconstructed_ba, reconstructed_ba, cycle_loss_aba = self.G_ba(transferred_ab, sentences_a,
                                                                            device=self.device)
+        # cycle_loss_aba = torch.clamp(cycle_loss_aba, max=5)
+
+        if cycle_loss_aba.isnan().any():
+            return False
 
         complete_loss_g_ab = lambdas[0] * cycle_loss_aba + lambdas[1] * loss_g_ab
         if mlflow_run is not None:
@@ -156,6 +160,8 @@ class CycleGANModel(nn.Module):
 
         # ---------- BEGIN : cycle B -> A ----------
         print("---------- BEGIN : cycle B -> A ----------")
+
+        return True
         # first half
         # out_transferred_ba, transferred_ba = self.G_ba(sentences_b, device=self.device)
 
