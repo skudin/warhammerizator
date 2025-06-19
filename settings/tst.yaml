@@ -16,12 +16,12 @@ hparams:
     pretrained_classifier_eval: null
 
   trainer:
-    epochs: 30
+    epochs: 4
     save_base_folder: /app/data/experiments/
     from_pretrained: null
-    save_steps: 300
+    save_steps: 1000
     eval_strategy: steps
-    eval_steps: 100
+    eval_steps: 1000
     additional_eval: 0
     control_file: null
     lambda_file: null
