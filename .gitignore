@@ -257,7 +257,4 @@ cython_debug/
 
 # Custom.
 data/*
-!data/models
-data/models/*
-!data/models/style_cls/
 !warhammerizator/scripts
